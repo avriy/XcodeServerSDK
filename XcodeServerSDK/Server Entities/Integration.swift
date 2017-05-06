@@ -8,28 +8,28 @@
 
 import Foundation
 
-public class Integration : XcodeServerEntity {
+open class Integration : XcodeServerEntity {
     
     //usually available during the whole integration's lifecycle
-    public let queuedDate: NSDate
-    public let shouldClean: Bool
-    public let currentStep: Step!
-    public let number: Int
+    open let queuedDate: Date
+    open let shouldClean: Bool
+    open let currentStep: Step!
+    open let number: Int
     
     //usually available only after the integration has finished
-    public let successStreak: Int?
-    public let startedDate: NSDate?
-    public let endedTime: NSDate?
-    public let duration: NSTimeInterval?
-    public let result: Result?
-    public let buildResultSummary: BuildResultSummary?
-    public let testedDevices: [Device]?
-    public let testHierarchy: TestHierarchy?
-    public let assets: NSDictionary?  //TODO: add typed array with parsing
-    public let blueprint: SourceControlBlueprint?
+    open let successStreak: Int?
+    open let startedDate: Date?
+    open let endedTime: Date?
+    open let duration: TimeInterval?
+    open let result: Result?
+    open let buildResultSummary: BuildResultSummary?
+    open let testedDevices: [Device]?
+    open let testHierarchy: TestHierarchy?
+    open let assets: JSON?  //TODO: add typed array with parsing
+    open let blueprint: SourceControlBlueprint?
     
     //new keys
-    public let expectedCompletionDate: NSDate?
+    open let expectedCompletionDate: Date?
     
     public enum Step : String {
         case Unknown = ""
@@ -63,7 +63,7 @@ public class Integration : XcodeServerEntity {
         case TriggerError = "trigger-error"
     }
     
-    public required init(json: NSDictionary) throws {
+    public required init(json: JSON) throws {
         
         self.queuedDate = try json.dateForKey("queuedDate")
         self.startedDate = json.optionalDateForKey("startedTime")
@@ -81,19 +81,10 @@ public class Integration : XcodeServerEntity {
             self.result = nil
         }
         
-        if let raw = json.optionalDictionaryForKey("buildResultSummary") {
-            self.buildResultSummary = try BuildResultSummary(json: raw)
-        } else {
-            self.buildResultSummary = nil
-        }
+        self.buildResultSummary = json.optionalXcodeReadValue("buildResultSummary")
+        self.testedDevices = json.optionalXcodeReadValues("testedDevices")
         
-        if let testedDevices = json.optionalArrayForKey("testedDevices") {
-            self.testedDevices = try XcodeServerArray(testedDevices)
-        } else {
-            self.testedDevices = nil
-        }
-        
-        if let testHierarchy = json.optionalDictionaryForKey("testHierarchy") where testHierarchy.count > 0 {
+        if let testHierarchy = json.optionalDictionaryForKey("testHierarchy"), testHierarchy.count > 0 {
             self.testHierarchy = try TestHierarchy(json: testHierarchy)
         } else {
             self.testHierarchy = nil
@@ -111,24 +102,24 @@ public class Integration : XcodeServerEntity {
     }
 }
 
-public class BuildResultSummary : XcodeServerEntity {
+open class BuildResultSummary : XcodeServerEntity {
     
-    public let analyzerWarningCount: Int
-    public let testFailureCount: Int
-    public let testsChange: Int
-    public let errorCount: Int
-    public let testsCount: Int
-    public let testFailureChange: Int
-    public let warningChange: Int
-    public let regressedPerfTestCount: Int
-    public let warningCount: Int
-    public let errorChange: Int
-    public let improvedPerfTestCount: Int
-    public let analyzerWarningChange: Int
-    public let codeCoveragePercentage: Int
-    public let codeCoveragePercentageDelta: Int
+    open let analyzerWarningCount: Int
+    open let testFailureCount: Int
+    open let testsChange: Int
+    open let errorCount: Int
+    open let testsCount: Int
+    open let testFailureChange: Int
+    open let warningChange: Int
+    open let regressedPerfTestCount: Int
+    open let warningCount: Int
+    open let errorChange: Int
+    open let improvedPerfTestCount: Int
+    open let analyzerWarningChange: Int
+    open let codeCoveragePercentage: Int
+    open let codeCoveragePercentageDelta: Int
     
-    public required init(json: NSDictionary) throws {
+    public required init(json: JSON) throws {
         
         self.analyzerWarningCount = try json.intForKey("analyzerWarningCount")
         self.testFailureCount = try json.intForKey("testFailureCount")

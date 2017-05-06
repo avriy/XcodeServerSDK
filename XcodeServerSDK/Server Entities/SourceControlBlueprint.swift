@@ -11,26 +11,26 @@ import BuildaUtils
 
 extension String {
     public var base64Encoded: String? {
-        let data = dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
-        return data?.base64EncodedStringWithOptions(.EncodingEndLineWithLineFeed)
+        let data = self.data(using: String.Encoding.utf8, allowLossyConversion: false)
+        return data?.base64EncodedString(options: .endLineWithLineFeed)
     }
 }
 
-public class SourceControlBlueprint : XcodeServerEntity {
+open class SourceControlBlueprint : XcodeServerEntity {
     
-    public let branch: String
-    public let projectWCCIdentifier: String
-    public let wCCName: String
-    public let projectName: String
-    public let projectURL: String
-    public let projectPath: String
-    public let commitSHA: String?
-    public let privateSSHKey: String?
-    public let publicSSHKey: String?
-    public let sshPassphrase: String?
-    public var certificateFingerprint: String? = nil
+    open let branch: String
+    open let projectWCCIdentifier: String
+    open let wCCName: String
+    open let projectName: String
+    open let projectURL: String
+    open let projectPath: String
+    open let commitSHA: String?
+    open let privateSSHKey: String?
+    open let publicSSHKey: String?
+    open let sshPassphrase: String?
+    open var certificateFingerprint: String? = nil
     
-    public required init(json: NSDictionary) throws {
+    public required init(json: [String: Any]) throws {
         
         self.wCCName = try json.stringForKey(XcodeBlueprintNameKey)
         
@@ -40,9 +40,9 @@ public class SourceControlBlueprint : XcodeServerEntity {
         let workingCopyPaths = try json.dictionaryForKey(XcodeBlueprintWorkingCopyPathsKey)
         self.projectName = try workingCopyPaths.stringForKey(primaryRepoId)
 
-        let repos: [NSDictionary] = try json.arrayForKey(XcodeBlueprintRemoteRepositoriesKey)
-        let primarys: [NSDictionary] = try repos.filter {
-            (item: NSDictionary) -> Bool in
+        let repos: [JSON] = try json.arrayForKey(XcodeBlueprintRemoteRepositoriesKey)
+        let primarys: [JSON] = try repos.filter {
+            (item: JSON) -> Bool in
             return try item.stringForKey(XcodeBlueprintRemoteRepositoryIdentifierKey) == primaryRepoId
         }
         
@@ -90,9 +90,9 @@ public class SourceControlBlueprint : XcodeServerEntity {
         self.init(branch: "", projectWCCIdentifier: "", wCCName: "", projectName: "", projectURL: projectURL, projectPath: "", publicSSHKey: publicSSHKey, privateSSHKey: privateSSHKey, sshPassphrase: sshPassphrase)
     }
     
-    public func dictionarifyRemoteAndCredentials() -> NSDictionary {
+    open func dictionarifyRemoteAndCredentials() -> JSON {
         
-        let dictionary = NSMutableDictionary()
+        var dictionary = JSON()
 
         let repoId = self.projectWCCIdentifier
         let remoteUrl = self.projectURL
@@ -143,9 +143,9 @@ public class SourceControlBlueprint : XcodeServerEntity {
         return dictionary
     }
     
-    private func dictionarifyForBotCreation() -> NSDictionary {
+    fileprivate func dictionarifyForBotCreation() -> [String: Any] {
         
-        let dictionary = self.dictionarifyRemoteAndCredentials().mutableCopy() as! NSMutableDictionary
+        var dictionary = self.dictionarifyRemoteAndCredentials()
 
         let repoId = self.projectWCCIdentifier
         var workingCopyPath = self.projectName
@@ -199,14 +199,14 @@ public class SourceControlBlueprint : XcodeServerEntity {
         //Xcode generates a hash from the data somehow, but passing in a random UUID works as well, so what the hell.
         //if someone figures out how to generate the same ID as Xcode does, I'm all yours.
         //TODO: give this a good investigation.
-        dictionary[XcodeBlueprintIdentifierKey] = NSUUID().UUIDString
+        dictionary[XcodeBlueprintIdentifierKey] = UUID().uuidString
         
         //and this is the end of our journey to create a new Blueprint. I hope you enjoyed the ride, please return the 3D glasses to the green bucket on your way out.
         
         return dictionary
     }
     
-    public override func dictionarify() -> NSDictionary {
+    open override func dictionarify() -> [String: Any] {
         
         return self.dictionarifyForBotCreation()
     }

@@ -19,7 +19,7 @@ class LiveUpdatesTests: XCTestCase {
         let packets: [SocketIOPacket] = SocketIOHelper.parsePackets(message)
         expect(packets.count) == 1
         let packet = packets.first!
-        expect(packet.type) == SocketIOPacket.PacketType.Connect
+        expect(packet.type) == SocketIOPacket.PacketType.connect
         expect(packet.jsonPayload).to(beNil())
         expect(packet.stringPayload) == ""
     }
@@ -29,10 +29,10 @@ class LiveUpdatesTests: XCTestCase {
         let packets: [SocketIOPacket] = SocketIOHelper.parsePackets(message)
         expect(packets.count) == 1
         let packet = packets.first!
-        expect(packet.type) == SocketIOPacket.PacketType.Error
+        expect(packet.type) == SocketIOPacket.PacketType.error
         let (reason, advice) = packet.parseError()
-        expect(reason) == SocketIOPacket.ErrorReason.ClientNotHandshaken
-        expect(advice) == SocketIOPacket.ErrorAdvice.Reconnect
+        expect(reason) == SocketIOPacket.ErrorReason.clientNotHandshaken
+        expect(advice) == SocketIOPacket.ErrorAdvice.reconnect
     }
     
     func testParsing_SingleEventMessage() throws {

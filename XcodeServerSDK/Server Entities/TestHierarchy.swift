@@ -10,19 +10,19 @@ import Foundation
 
 let TestResultAggregateKey = "_xcsAggrDeviceStatus"
 
-public class TestHierarchy : XcodeServerEntity {
+open class TestHierarchy : XcodeServerEntity {
     
     typealias TestResult = [String: Double]
     typealias AggregateResult = TestResult
     
     enum TestMethod {
-        case Method(TestResult)
-        case Aggregate(AggregateResult)
+        case method(TestResult)
+        case aggregate(AggregateResult)
     }
     
     enum TestClass {
-        case Class([String: TestMethod])
-        case Aggregate(AggregateResult)
+        case `class`([String: TestMethod])
+        case aggregate(AggregateResult)
     }
     
     typealias TestTarget = [String: TestClass]
@@ -66,7 +66,7 @@ public class TestHierarchy : XcodeServerEntity {
     which is the aggregated status, so that you don't have to iterate through all tests to figure it out yourself. 1 if all are 1, 0 otherwise.
     */
     
-    public required init(json: NSDictionary) throws {
+    public required init(json: JSON) throws {
         
         //TODO: come up with useful things to parse
         //TODO: add search capabilities, aggregate generation etc
@@ -76,20 +76,19 @@ public class TestHierarchy : XcodeServerEntity {
         try super.init(json: json)
     }
     
-    class func pullData(json: NSDictionary) -> TestData {
+    class func pullData(_ json: JSON) -> TestData {
         
         var data = TestData()
         
         for (_targetName, _targetData) in json {
-            let targetName = _targetName as! String
             let targetData = _targetData as! NSDictionary
-            data[targetName] = pullTarget(targetName, targetData: targetData)
+            data[_targetName] = pullTarget(_targetName, targetData: targetData)
         }
         
         return data
     }
     
-    class func pullTarget(targetName: String, targetData: NSDictionary) -> TestTarget {
+    class func pullTarget(_ targetName: String, targetData: NSDictionary) -> TestTarget {
         
         var target = TestTarget()
         
@@ -102,11 +101,11 @@ public class TestHierarchy : XcodeServerEntity {
         return target
     }
     
-    class func pullClass(className: String, classData: NSDictionary) -> TestClass {
+    class func pullClass(_ className: String, classData: NSDictionary) -> TestClass {
         
         let classy: TestClass
         if className == TestResultAggregateKey {
-            classy = TestClass.Aggregate(classData as! AggregateResult)
+            classy = TestClass.aggregate(classData as! AggregateResult)
         } else {
             
             var newData = [String: TestMethod]()
@@ -117,18 +116,18 @@ public class TestHierarchy : XcodeServerEntity {
                 newData[methodName] = pullMethod(methodName, methodData: methodData)
             }
             
-            classy = TestClass.Class(newData)
+            classy = TestClass.class(newData)
         }
         return classy
     }
     
-    class func pullMethod(methodName: String, methodData: NSDictionary) -> TestMethod {
+    class func pullMethod(_ methodName: String, methodData: NSDictionary) -> TestMethod {
         
         let method: TestMethod
         if methodName == TestResultAggregateKey {
-            method = TestMethod.Aggregate(methodData as! AggregateResult)
+            method = TestMethod.aggregate(methodData as! AggregateResult)
         } else {
-            method = TestMethod.Method(methodData as! TestResult)
+            method = TestMethod.method(methodData as! TestResult)
         }
         return method
     }

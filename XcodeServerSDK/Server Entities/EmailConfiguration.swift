@@ -8,12 +8,12 @@
 
 import Foundation
 
-public class EmailConfiguration : XcodeServerEntity {
+open class EmailConfiguration : XcodeServerEntity {
     
-    public let additionalRecipients: [String]
-    public let emailCommitters: Bool
-    public let includeCommitMessages: Bool
-    public let includeIssueDetails: Bool
+    open let additionalRecipients: [String]
+    open let emailCommitters: Bool
+    open let includeCommitMessages: Bool
+    open let includeIssueDetails: Bool
     
     public init(additionalRecipients: [String], emailCommitters: Bool, includeCommitMessages: Bool, includeIssueDetails: Bool) {
         
@@ -25,9 +25,9 @@ public class EmailConfiguration : XcodeServerEntity {
         super.init()
     }
     
-    public override func dictionarify() -> NSDictionary {
+    open override func dictionarify() -> JSON {
         
-        let dict = NSMutableDictionary()
+        var dict = JSON()
         
         dict["emailCommitters"] = self.emailCommitters
         dict["includeCommitMessages"] = self.includeCommitMessages
@@ -37,7 +37,7 @@ public class EmailConfiguration : XcodeServerEntity {
         return dict
     }
     
-    public required init(json: NSDictionary) throws {
+    public required init(json: JSON) throws {
         
         self.emailCommitters = try json.boolForKey("emailCommitters")
         self.includeCommitMessages = try json.boolForKey("includeCommitMessages")

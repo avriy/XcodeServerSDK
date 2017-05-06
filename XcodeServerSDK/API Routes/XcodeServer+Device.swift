@@ -18,22 +18,22 @@ extension XcodeServer {
     - parameter devices: Optional array of available devices.
     - parameter error:   Optional error indicating that something went wrong.
     */
-    public final func getDevices(completion: (devices: [Device]?, error: NSError?) -> ()) {
+    public final func getDevices(_ completion: @escaping (_ devices: [Device]?, _ error: Error?) -> ()) {
         
-        self.sendRequestWithMethod(.GET, endpoint: .Devices, params: nil, query: nil, body: nil) { (response, body, error) -> () in
+        self.sendRequestWithMethod(.get, endpoint: .devices, params: nil, query: nil, body: nil) { (response, body, error) -> () in
             
             if error != nil {
-                completion(devices: nil, error: error)
+                completion(nil, error)
                 return
             }
             
-            if let array = (body as? NSDictionary)?["results"] as? NSArray {
+            if let array = (body as? JSON)?["results"] as? [JSON] {
                 let (result, error): ([Device]?, NSError?) = unthrow {
                     return try XcodeServerArray(array)
                 }
-                completion(devices: result, error: error)
+                completion(result, error)
             } else {
-                completion(devices: nil, error: Error.withInfo("Wrong body \(body)"))
+                completion(nil, MyError.withInfo("Wrong body \(body)"))
             }
         }
     }

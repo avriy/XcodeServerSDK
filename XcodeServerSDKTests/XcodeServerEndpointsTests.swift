@@ -23,58 +23,58 @@ class XcodeServerEndpointsTests: XCTestCase {
     
     // If malformed URL is passed to request creation function it should early exit and retur nil
     func testMalformedURLCreation() {
-        let expectation = endpoints?.createRequest(.GET, endpoint: .Bots, params: ["test": "test"], query: ["test//http\\": "!test"], body: ["test": "test"], doBasicAuth: true)
+        let expectation = endpoints?.createRequest(.get, endpoint: .bots, params: ["test": "test"], query: ["test//http\\": "!test"], body: ["test": "test"], doBasicAuth: true)
         XCTAssertNil(expectation, "Shouldn't create request from malformed URL")
     }
     
     func testRequestCreationForEmptyAuthorizationParams() {
-        let expectedUrl = NSURL(string: "https://127.0.0.1:20343/api/bots/bot_id/integrations")
-        let expectedRequest = NSMutableURLRequest(URL: expectedUrl!)
+        let expectedUrl = URL(string: "https://127.0.0.1:20343/api/bots/bot_id/integrations")
+        var expectedRequest = URLRequest(url: expectedUrl!)
         // HTTPMethod
-        expectedRequest.HTTPMethod = "GET"
+        expectedRequest.httpMethod = "GET"
         // Authorization header: "": ""
         expectedRequest.setValue("Basic Og==", forHTTPHeaderField: "Authorization")
         
         let noAuthorizationConfig = try! XcodeServerConfig(host: "https://127.0.0.1")
         let noAuthorizationEndpoints = XcodeServerEndpoints(serverConfig: noAuthorizationConfig)
-        let request = noAuthorizationEndpoints.createRequest(.GET, endpoint: .Integrations, params: ["bot": "bot_id"], query: nil, body: nil, doBasicAuth: true)
+        let request = noAuthorizationEndpoints.createRequest(.get, endpoint: .integrations, params: ["bot": "bot_id"], query: nil, body: nil, doBasicAuth: true)
         XCTAssertEqual(expectedRequest, request!)
     }
     
     func testGETRequestCreation() {
-        let expectedUrl = NSURL(string: "https://127.0.0.1:20343/api/bots/bot_id/integrations?format=json")
-        let expectedRequest = NSMutableURLRequest(URL: expectedUrl!)
+        let expectedUrl = URL(string: "https://127.0.0.1:20343/api/bots/bot_id/integrations?format=json")
+        var expectedRequest = URLRequest(url: expectedUrl!)
         // HTTPMethod
-        expectedRequest.HTTPMethod = "GET"
+        expectedRequest.httpMethod = "GET"
         // Authorization header: "test": "test"
         expectedRequest.setValue("Basic dGVzdDp0ZXN0", forHTTPHeaderField: "Authorization")
         
-        let request = self.endpoints?.createRequest(.GET, endpoint: .Integrations, params: ["bot": "bot_id"], query: ["format": "json"], body: nil, doBasicAuth: true)
+        let request = self.endpoints?.createRequest(.get, endpoint: .integrations, params: ["bot": "bot_id"], query: ["format": "json"], body: nil, doBasicAuth: true)
         XCTAssertEqual(expectedRequest, request!)
     }
     
     func testPOSTRequestCreation() {
-        let expectedUrl = NSURL(string: "https://127.0.0.1:20343/api/auth/logout")
-        let expectedRequest = NSMutableURLRequest(URL: expectedUrl!)
+        let expectedUrl = URL(string: "https://127.0.0.1:20343/api/auth/logout")
+        var expectedRequest = URLRequest(url: expectedUrl!)
         // HTTPMethod
-        expectedRequest.HTTPMethod = "POST"
+        expectedRequest.httpMethod = "POST"
         // HTTPBody
-        let expectedData = "{\n  \"bodyParam\" : \"bodyValue\"\n}".dataUsingEncoding(NSUTF8StringEncoding)
-        expectedRequest.HTTPBody = expectedData!
+        let expectedData = "{\n  \"bodyParam\" : \"bodyValue\"\n}".data(using: String.Encoding.utf8)
+        expectedRequest.httpBody = expectedData!
         expectedRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let request = self.endpoints?.createRequest(.POST, endpoint: .Logout, params: nil, query: nil, body: ["bodyParam": "bodyValue"], doBasicAuth: false)
+        let request = self.endpoints?.createRequest(.post, endpoint: .logout, params: nil, query: nil, body: ["bodyParam": "bodyValue"], doBasicAuth: false)
         XCTAssertEqual(expectedRequest, request!)
-        XCTAssertEqual(expectedRequest.HTTPBody!, request!.HTTPBody!)
+        XCTAssertEqual(expectedRequest.httpBody!, request!.httpBody!)
     }
     
     func testDELETERequestCreation() {
-        let expectedUrl = NSURL(string: "https://127.0.0.1:20343/api/bots/bot_id/rev_id")
-        let expectedRequest = NSMutableURLRequest(URL: expectedUrl!)
+        let expectedUrl = URL(string: "https://127.0.0.1:20343/api/bots/bot_id/rev_id")
+        var expectedRequest = URLRequest(url: expectedUrl!)
         // HTTPMethod
-        expectedRequest.HTTPMethod = "DELETE"
+        expectedRequest.httpMethod = "DELETE"
         
-        let request = self.endpoints?.createRequest(.DELETE, endpoint: .Bots, params: ["bot": "bot_id", "rev": "rev_id"], query: nil, body: nil, doBasicAuth: false)
+        let request = self.endpoints?.createRequest(.delete, endpoint: .bots, params: ["bot": "bot_id", "rev": "rev_id"], query: nil, body: nil, doBasicAuth: false)
         XCTAssertEqual(expectedRequest, request!)
     }
     
@@ -82,8 +82,8 @@ class XcodeServerEndpointsTests: XCTestCase {
     
     func testEndpointURLCreationForBotsPath() {
         let expectation = "/api/bots"
-        let url = self.endpoints?.endpointURL(.Bots)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Bots) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.bots)
+        XCTAssertEqual(url!, expectation, "endpointURL(.bots) should return \(expectation)")
     }
     
     func testEndpointURLCreationForBotsBotPath() {
@@ -91,8 +91,8 @@ class XcodeServerEndpointsTests: XCTestCase {
         let params = [
             "bot": "bot_id"
         ]
-        let url = self.endpoints?.endpointURL(.Bots, params: params)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Bots, \(params)) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.bots, params: params)
+        XCTAssertEqual(url!, expectation, "endpointURL(.bots, \(params)) should return \(expectation)")
     }
     
     func testEndpointURLCreationForBotsBotRevPath() {
@@ -102,16 +102,16 @@ class XcodeServerEndpointsTests: XCTestCase {
             "rev": "rev_id",
             "method": "DELETE"
         ]
-        let url = self.endpoints?.endpointURL(.Bots, params: params)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Bots, \(params)) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.bots, params: params)
+        XCTAssertEqual(url!, expectation, "endpointURL(.bots, \(params)) should return \(expectation)")
     }
     
     // MARK: endpointURL(.Integrations)
     
     func testEndpointURLCreationForIntegrationsPath() {
         let expectation = "/api/integrations"
-        let url = self.endpoints?.endpointURL(.Integrations)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Integrations) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.integrations)
+        XCTAssertEqual(url!, expectation, "endpointURL(.integrations) should return \(expectation)")
     }
     
     func testEndpointURLCreationForIntegrationsIntegrationPath() {
@@ -119,8 +119,8 @@ class XcodeServerEndpointsTests: XCTestCase {
         let params = [
             "integration": "integration_id"
         ]
-        let url = self.endpoints?.endpointURL(.Integrations, params: params)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Integrations, \(params)) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.integrations, params: params)
+        XCTAssertEqual(url!, expectation, "endpointURL(.integrations, \(params)) should return \(expectation)")
     }
     
     func testEndpointURLCreationForBotsBotIntegrationsPath() {
@@ -128,8 +128,8 @@ class XcodeServerEndpointsTests: XCTestCase {
         let params = [
             "bot": "bot_id"
         ]
-        let url = self.endpoints?.endpointURL(.Integrations, params: params)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Integrations, \(params)) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.integrations, params: params)
+        XCTAssertEqual(url!, expectation, "endpointURL(.integrations, \(params)) should return \(expectation)")
     }
     
     // MARK: endpointURL(.CancelIntegration)
@@ -139,93 +139,93 @@ class XcodeServerEndpointsTests: XCTestCase {
         let params = [
             "integration": "integration_id"
         ]
-        let url = self.endpoints?.endpointURL(.CancelIntegration, params: params)
-        XCTAssertEqual(url!, expectation, "endpointURL(.CancelIntegration, \(params)) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.cancelIntegration, params: params)
+        XCTAssertEqual(url!, expectation, "endpointURL(.cancelIntegration, \(params)) should return \(expectation)")
     }
     
     // MARK: endpointURL(.Devices)
     
     func testEndpointURLCreationForDevicesPath() {
         let expectation = "/api/devices"
-        let url = self.endpoints?.endpointURL(.Devices)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Devices) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.devices)
+        XCTAssertEqual(url!, expectation, "endpointURL(.devices) should return \(expectation)")
     }
     
     // MARK: endpointURL(.UserCanCreateBots)
     
     func testEndpointURLCreationForAuthIsBotCreatorPath() {
         let expectation = "/api/auth/isBotCreator"
-        let url = self.endpoints?.endpointURL(.UserCanCreateBots)
-        XCTAssertEqual(url!, expectation, "endpointURL(.UserCanCreateBots) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.userCanCreateBots)
+        XCTAssertEqual(url!, expectation, "endpointURL(.userCanCreateBots) should return \(expectation)")
     }
     
     // MARK: endpointURL(.Login)
     
     func testEndpointURLCreationForAuthLoginPath() {
         let expectation = "/api/auth/login"
-        let url = self.endpoints?.endpointURL(.Login)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Login) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.login)
+        XCTAssertEqual(url!, expectation, "endpointURL(.login) should return \(expectation)")
     }
     
-    // MARK: endpointURL(.Logout)
+    // MARK: endpointURL(.logout)
     
     func testEndpointURLCreationForAuthLogoutPath() {
         let expectation = "/api/auth/logout"
-        let url = self.endpoints?.endpointURL(.Logout)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Logout) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.logout)
+        XCTAssertEqual(url!, expectation, "endpointURL(.logout) should return \(expectation)")
     }
     
-    // MARK: endpointURL(.Platforms)
+    // MARK: endpointURL(.platforms)
     
     func testEndpointURLCreationForPlatformsPath() {
         let expectation = "/api/platforms"
-        let url = self.endpoints?.endpointURL(.Platforms)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Platforms) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.platforms)
+        XCTAssertEqual(url!, expectation, "endpointURL(.platforms) should return \(expectation)")
     }
     
-    // MARK: endpointURL(.SCM_Branches)
+    // MARK: endpointURL(.scm_Branches)
     
     func testEndpointURLCreationForScmBranchesPath() {
         let expectation = "/api/scm/branches"
-        let url = self.endpoints?.endpointURL(.SCM_Branches)
-        XCTAssertEqual(url!, expectation, "endpointURL(.SCM_Branches) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.scm_Branches)
+        XCTAssertEqual(url!, expectation, "endpointURL(.scm_Branches) should return \(expectation)")
     }
     
-    // MARK: endpointURL(.Repositories)
+    // MARK: endpointURL(.repositories)
     
     func testEndpointURLCreationForRepositoriesPath() {
         let expectation = "/api/repositories"
-        let url = self.endpoints?.endpointURL(.Repositories)
-        XCTAssertEqual(url!, expectation, "endpointURL(.Repositories) should return \(expectation)")
+        let url = self.endpoints?.endpointURL(.repositories)
+        XCTAssertEqual(url!, expectation, "endpointURL(.repositories) should return \(expectation)")
     }
     
-    // MARK: endpointURL(.Commits)
+    // MARK: endpointURL(.commits)
     
     func testEndpointURLCreationForCommits() {
         let expected = "/api/integrations/integration_id/commits"
         let params = [
             "integration": "integration_id"
         ]
-        let url = self.endpoints?.endpointURL(.Commits, params: params)
+        let url = self.endpoints?.endpointURL(.commits, params: params)
         XCTAssertEqual(url!, expected)
     }
     
-    // MARK: endpointURL(.Issues)
+    // MARK: endpointURL(.issues)
     
     func testEndpointURLCreationForIssues() {
         let expected = "/api/integrations/integration_id/issues"
         let params = [
             "integration": "integration_id"
         ]
-        let url = self.endpoints?.endpointURL(.Issues, params: params)
+        let url = self.endpoints?.endpointURL(.issues, params: params)
         XCTAssertEqual(url!, expected)
     }
     
-    // MARK: endpoingURL(.LiveUpdates)
+    // MARK: endpoingURL(.liveUpdates)
     
     func testEndpointURLCreationForLiveUpdates_Start() {
         let expected = "/xcode/internal/socket.io/1"
-        let url = self.endpoints?.endpointURL(.LiveUpdates, params: nil)
+        let url = self.endpoints?.endpointURL(.liveUpdates, params: nil)
         XCTAssertEqual(url!, expected)
     }
     
@@ -234,7 +234,7 @@ class XcodeServerEndpointsTests: XCTestCase {
         let params = [
             "poll_id": "sup3rS3cret"
         ]
-        let url = self.endpoints?.endpointURL(.LiveUpdates, params: params)
+        let url = self.endpoints?.endpointURL(.liveUpdates, params: params)
         XCTAssertEqual(url!, expected)
     }
 }

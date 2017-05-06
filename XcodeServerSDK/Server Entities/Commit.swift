@@ -8,19 +8,19 @@
 
 import Foundation
 
-public class Commit: XcodeServerEntity {
+open class Commit: XcodeServerEntity {
     
-    public let hash: String
-    public let filePaths: [File]
-    public let message: String?
-    public let date: NSDate
-    public let repositoryID: String
-    public let contributor: Contributor
+    open let hash: String
+    open let filePaths: [File]
+    open let message: String?
+    open let date: Date
+    open let repositoryID: String
+    open let contributor: Contributor
     
     // MARK: Initializers
-    public required init(json: NSDictionary) throws {
+    public required init(json: [String: Any]) throws {
         self.hash = try json.stringForKey("XCSCommitHash")
-        self.filePaths = try json.arrayForKey("XCSCommitCommitChangeFilePaths").map { try File(json: $0) }
+        self.filePaths = try json.xcodeReadValues("XCSCommitCommitChangeFilePaths")
         self.message = json.optionalStringForKey("XCSCommitMessage")
         self.date = try json.dateForKey("XCSCommitTimestamp")
         self.repositoryID = try json.stringForKey("XCSBlueprintRepositoryID")
@@ -28,5 +28,4 @@ public class Commit: XcodeServerEntity {
         
         try super.init(json: json)
     }
-    
 }

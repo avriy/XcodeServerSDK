@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class LiveUpdateMessage: XcodeServerEntity {
+open class LiveUpdateMessage: XcodeServerEntity {
     
     public enum MessageType: String {
         
@@ -43,15 +43,15 @@ public class LiveUpdateMessage: XcodeServerEntity {
         case Unknown = ""
     }
     
-    public let type: MessageType
-    public let message: String?
-    public let progress: Double?
-    public let integrationId: String?
-    public let botId: String?
-    public let result: Integration.Result?
-    public let currentStep: Integration.Step?
+    open let type: MessageType
+    open let message: String?
+    open let progress: Double?
+    open let integrationId: String?
+    open let botId: String?
+    open let result: Integration.Result?
+    open let currentStep: Integration.Step?
     
-    required public init(json: NSDictionary) throws {
+    required public init(json: [String: Any]) throws {
         
         let typeString = json.optionalStringForKey("name") ?? ""
         
@@ -101,7 +101,7 @@ extension LiveUpdateMessage: CustomStringConvertible {
             .filter { $0.characters.count > 0 }
             .map { "\"\($0)\"" }
         
-        let str = nonNilComps.joinWithSeparator(", ")
+        let str = nonNilComps.joined(separator: ", ")
         return "LiveUpdateMessage \"\(self.type)\", \(str)"
     }
 }

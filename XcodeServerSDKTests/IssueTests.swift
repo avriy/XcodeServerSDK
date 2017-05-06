@@ -75,8 +75,8 @@ class IssueTests: XCTestCase {
     }
     
     func testPayload() {
-        XCTAssertEqual(buildServiceError.payload.allKeys.count, 9)
-        XCTAssertEqual(errorWithCommits.payload.allKeys.count, 13)
+        XCTAssertEqual(buildServiceError.payload.keys.count, 9)
+        XCTAssertEqual(errorWithCommits.payload.values.count, 13)
         
         // Check if Error payload contain line number
         let expectation = errorWithCommits.payload["lineNumber"] as! Int

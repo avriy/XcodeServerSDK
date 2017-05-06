@@ -9,15 +9,15 @@
 import Foundation
 import BuildaUtils
 
-public class IntegrationCommits: XcodeServerEntity {
+open class IntegrationCommits: XcodeServerEntity {
     
-    public let integration: String
-    public let botTinyID: String
-    public let botID: String
-    public let commits: [String: [Commit]]
-    public let endedTimeDate: NSDate?
+    open let integration: String
+    open let botTinyID: String
+    open let botID: String
+    open let commits: [String: [Commit]]
+    open let endedTimeDate: Date?
     
-    public required init(json: NSDictionary) throws {
+    public required init(json: JSON) throws {
         self.integration = try json.stringForKey("integration")
         self.botTinyID = try json.stringForKey("botTinyID")
         self.botID = try json.stringForKey("botID")
@@ -34,11 +34,12 @@ public class IntegrationCommits: XcodeServerEntity {
     
     - returns: Dictionary of parsed Commit objects.
     */
-    class func populateCommits(json: NSDictionary) throws -> [String: [Commit]] {
-        var resultsDictionary: [String: [Commit]] = Dictionary()
+    class func populateCommits(_ json: JSON) throws -> [String: [Commit]] {
+        var resultsDictionary = [String: [Commit]]()
         
         for (key, value) in json {
-            guard let blueprintID = key as? String, let commitsArray = value as? [NSDictionary] else {
+            let blueprintID = key
+            guard let commitsArray = value as? [JSON] else {
                 Log.error("Couldn't parse key \(key) and value \(value)")
                 continue
             }
@@ -56,22 +57,18 @@ public class IntegrationCommits: XcodeServerEntity {
     
     - returns: Optional parsed date to the format used by Xcode Server.
     */
-    class func parseDate(array: NSArray) -> NSDate? {
-        guard let dateArray = array as? [Int] else {
-            Log.error("Couldn't parse XCS date array")
-            return nil
-        }
-        
+    class func parseDate(_ array: [Int]) -> Date? {
+
         do {
-            let stringDate = try dateArray.dateString()
+            let stringDate = try array.dateString()
             
-            guard let date = NSDate.dateFromXCSString(stringDate) else {
+            guard let date = Date.dateFromXCSString(stringDate) else {
                 Log.error("Formatter couldn't parse date")
                 return nil
             }
             
             return date
-        } catch DateParsingError.WrongNumberOfElements(let elements) {
+        } catch DateParsingError.wrongNumberOfElements(let elements) {
             Log.error("Couldn't parse date as Array has \(elements) elements")
         } catch {
             Log.error("Something went wrong while parsing date")

@@ -14,4 +14,4 @@ server.getBots { (bots, error) -> () in
     print(bots)
 }
 
-XCPSetExecutionShouldContinueIndefinitely(true)
+XCPSetExecutionShouldContinueIndefinitely(continueIndefinitely: true)

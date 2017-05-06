@@ -11,7 +11,7 @@ import XCTest
 
 class ContributorTests: XCTestCase {
 
-    let singleEmailContributor = [
+    let singleEmailContributor: JSON = [
         kContributorName: "Foo Bar",
         kContributorDisplayName: "Foo",
         kContributorEmails: [
@@ -19,7 +19,7 @@ class ContributorTests: XCTestCase {
         ]
     ]
     
-    let multiEmailContributor = [
+    let multiEmailContributor: JSON = [
         kContributorName: "Baz Bar",
         kContributorDisplayName: "Baz",
         kContributorEmails: [
